@@ -1,0 +1,15 @@
+# Local config and secrets — never commit
+.env
+.env.*
+!.env.example.json
+*.local.*
+
+# Supabase local state
+supabase/.temp/
+supabase/.branches/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
