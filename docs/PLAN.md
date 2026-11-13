@@ -182,11 +182,22 @@ One phase at a time; don't start a phase until the previous "done when" passes.
 | 5 | Social | Likes, comments, friend requests, other user's profile | Counts update; friends-only posts only to friends |
 | 6 | Profile + progress | Badge grid, streak with freezes, categories tried, edit profile | Streak maths unit-tested |
 | 7 | Safety + admin | Report, block, auto-hide, admin panel, delete account, privacy policy | Admin can hide a reported post; deletion removes R2 files |
+| 7.5 | Challenge suggestions | `challenge_ideas` + `idea_votes` tables, Ideas tab (suggest, upvote, sort by votes), report/hide on ideas, admin "promote to week" in the admin panel, "suggested by @user" credit on the challenge card | A user can suggest an idea, others can upvote it, an admin promotes the top idea into an empty future week, and it shows with credit when that week opens |
 | 8 | Ship + polish | Pages deploy, APK release, keep-alive, empty/error/loading states, dark mode, app icon | Public web link and APK work on a fresh device |
 
 Testing: SQL tests (pgTAP or plain queries) for every visibility rule, widget tests for each screen's main state, `flutter analyze` at zero warnings.
 
-Stretch: Circles, past-challenges archive, push notifications, user-suggested challenges with voting, iOS TestFlight.
+Stretch: Circles, past-challenges archive, push notifications, iOS TestFlight.
+
+### Phase 7.5: challenge suggestions (decided 2026-11-13)
+
+Users suggest and vote on ideas for the shared weekly challenge; they do not run their own separate challenges. Built after Phase 7 because ideas are user-generated content and need report/hide and the admin panel.
+
+- **Suggest:** title, description, category, optional tips. Same length and category rules as `challenges`. Rate limit (e.g. 3 ideas per user per week). Visible to signed-in users; blocked users' ideas hidden.
+- **Vote:** one upvote per user per idea, can be undone; `vote_count` kept by trigger. No voting on your own idea.
+- **Promote:** an admin picks an idea (normally the top-voted) and schedules it into an empty future week; it becomes a normal `challenges` row with `suggested_by` and `idea_id`. The idea is marked `promoted`.
+- **Open question for that phase:** fully automatic promotion (top idea fills the next empty week) vs admin approval. Default: admin approval, since challenges must be safe and doable at home.
+- Seeded challenges fill 12 weeks ahead, so promoted ideas need empty weeks: seed fewer weeks or let admins move scheduled challenges.
 
 ## Sources
 
