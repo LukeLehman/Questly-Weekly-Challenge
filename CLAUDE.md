@@ -44,7 +44,8 @@ From the repo root:
 
 ```sh
 npx supabase start                   # local backend (needs Docker)
-npx supabase db reset                # re-apply migrations + seed.sql
+npx supabase migration up            # apply new migrations, KEEPS existing data
+npx supabase db reset                # wipes ALL data (incl. accounts); ask the owner first
 npx supabase status                  # local URL + anon key
 npx supabase test db                 # pgTAP tests in supabase/tests
 ```
@@ -78,5 +79,6 @@ Run the web app on port 3000 (`--web-port 3000`): Supabase auth only redirects t
 - **Never** put service keys or R2 credentials in the Flutter app or the repo. They belong in Edge Function secrets or GitHub Actions secrets. The app ships only the Supabase URL and anon key.
 - Stay on free tiers: 60 s / 720p video cap, compress on device.
 - Develop against local Supabase (`supabase start`), not the live project.
+- The owner tests with real accounts in the local DB. Apply schema changes with `npx supabase migration up`; never run `supabase db reset` without asking. End-to-end checks must clean up any accounts they create.
 - End of each phase: run `flutter analyze` and all tests, explain how to run it, list anything the owner must do by hand (accounts, secrets), then stop for review.
 - If something in the plan is unclear or impossible, ask instead of guessing.
