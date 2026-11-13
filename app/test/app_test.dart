@@ -18,6 +18,20 @@ void main() {
     expect(find.text('Backend not configured'), findsOneWidget);
   });
 
+  testWidgets('a session for a deleted account is signed out', (tester) async {
+    final profiles = FakeProfileRepository()..deletedUsers.add('ghost');
+    await tester.pumpWidget(
+      testApp(
+        auth: FakeAuthRepository(signedInAs: 'ghost'),
+        profiles: profiles,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(OnboardingScreen), findsNothing);
+    expect(find.byType(SignInScreen), findsOneWidget);
+  });
+
   testWidgets('full Phase 1 flow: sign up, set username, sign out, sign in', (
     tester,
   ) async {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../profile/data/profile_repository.dart';
+import '../data/auth_repository.dart';
 import '../../profile/domain/username.dart';
 import 'auth_providers.dart';
 
@@ -77,7 +78,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Set up your profile')),
+      appBar: AppBar(
+        title: const Text('Set up your profile'),
+        actions: [
+          TextButton(
+            key: const Key('onboarding-sign-out'),
+            onPressed: _busy
+                ? null
+                : () => ref.read(authRepositoryProvider).signOut(),
+            child: const Text('Sign out'),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

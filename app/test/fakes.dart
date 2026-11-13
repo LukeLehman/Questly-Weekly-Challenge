@@ -66,11 +66,15 @@ class FakeAuthRepository implements AuthRepository {
 class FakeProfileRepository implements ProfileRepository {
   final profiles = <String, Profile>{};
 
+  /// Accounts that no longer exist (no profile row), e.g. after a DB reset.
+  final deletedUsers = <String>{};
+
   Profile _row(String id) =>
       profiles[id] ??= Profile(id: id, createdAt: DateTime(2026, 11, 13));
 
   @override
-  Future<Profile?> fetchProfile(String userId) async => _row(userId);
+  Future<Profile?> fetchProfile(String userId) async =>
+      deletedUsers.contains(userId) ? null : _row(userId);
 
   @override
   Future<bool> isUsernameAvailable(String username) async =>
@@ -85,6 +89,9 @@ class FakeProfileRepository implements ProfileRepository {
   }) async {
     if (!await isUsernameAvailable(username)) {
       throw const UsernameTakenException();
+    }
+    if (deletedUsers.contains(userId)) {
+      throw StateError('Profile $userId not found or not writable');
     }
     profiles[userId] = _row(userId).copyWith(
       username: normalizeUsername(username),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:questly/features/auth/presentation/onboarding_screen.dart';
+import 'package:questly/features/auth/presentation/sign_in_screen.dart';
 import 'package:questly/features/challenge/presentation/this_week_screen.dart';
 import 'package:questly/features/profile/domain/profile.dart';
 
@@ -54,6 +55,26 @@ void main() {
     await tester.tap(find.byKey(const Key('finish')));
     await tester.pumpAndSettle();
     expect(find.text('That username is taken'), findsOneWidget);
+  });
+
+  testWidgets('can sign out from onboarding', (tester) async {
+    await pumpOnboarding(tester);
+    await tester.tap(find.byKey(const Key('onboarding-sign-out')));
+    await tester.pumpAndSettle();
+    expect(find.byType(SignInScreen), findsOneWidget);
+  });
+
+  testWidgets('shows an error instead of silently doing nothing', (
+    tester,
+  ) async {
+    await pumpOnboarding(tester);
+    // Account disappears after the screen loaded.
+    profiles.deletedUsers.add('me');
+    await tester.enterText(find.byKey(const Key('username')), 'newbie');
+    await tester.tap(find.byKey(const Key('age')));
+    await tester.tap(find.byKey(const Key('finish')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('onboarding-error')), findsOneWidget);
   });
 
   testWidgets('saves profile and goes home', (tester) async {

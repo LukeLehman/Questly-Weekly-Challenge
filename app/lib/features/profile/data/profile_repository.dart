@@ -55,7 +55,7 @@ class SupabaseProfileRepository implements ProfileRepository {
   }) async {
     final name = displayName?.trim();
     try {
-      await _client
+      final updated = await _client
           .from('profiles')
           .update({
             'username': normalizeUsername(username),
@@ -63,7 +63,12 @@ class SupabaseProfileRepository implements ProfileRepository {
             'is_private': isPrivate,
             'age_confirmed': true,
           })
-          .eq('id', userId);
+          .eq('id', userId)
+          .select('id');
+      // RLS turns "not your row / no such row" into 0 rows, not an error.
+      if (updated.isEmpty) {
+        throw StateError('Profile $userId not found or not writable');
+      }
     } on PostgrestException catch (e) {
       if (e.code == '23505') throw const UsernameTakenException();
       rethrow;
