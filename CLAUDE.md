@@ -37,7 +37,7 @@ flutter pub get
 flutter analyze                      # must be zero issues
 flutter test
 dart run build_runner build -d       # regenerate freezed/json code
-flutter run -d chrome --dart-define-from-file=../.env.json
+flutter run -d chrome --web-port 3000 --dart-define-from-file=../.env.json
 ```
 
 From the repo root:
@@ -46,11 +46,28 @@ From the repo root:
 npx supabase start                   # local backend (needs Docker)
 npx supabase db reset                # re-apply migrations + seed.sql
 npx supabase status                  # local URL + anon key
+npx supabase test db                 # pgTAP tests in supabase/tests
 ```
 
 ## Config
 
 The app reads `SUPABASE_URL` and `SUPABASE_ANON_KEY` via `--dart-define` (see `app/lib/core/env.dart`). Local values go in `.env.json` at the repo root (git-ignored; copy `.env.example.json`). The app must run without them, showing an offline placeholder instead of crashing.
+
+Run the web app on port 3000 (`--web-port 3000`): Supabase auth only redirects to URLs listed in `supabase/config.toml`.
+
+## Architecture conventions
+
+- Widgets never touch `Supabase.instance`. Each feature has a repository interface in `data/` with a `Supabase…Repository` implementation, exposed via a Riverpod provider. Tests override those providers with fakes (`app/test/fakes.dart`).
+- Routing: `app/lib/core/router.dart`. `authRedirect` sends users to sign-in → onboarding (until `profiles.username` is set) → home.
+- Database tests: `supabase/tests/database/*.test.sql` (pgTAP), run with `npx supabase test db`.
+- Generated files (`*.g.dart`, `*.freezed.dart`) are committed. Re-run build_runner after changing a model.
+
+## Google sign-in (manual setup)
+
+1. Google Cloud Console → APIs & Services → Credentials → create an OAuth client ID (Web application).
+2. Authorised redirect URI: `http://127.0.0.1:54321/auth/v1/callback` (local) and `https://<project-ref>.supabase.co/auth/v1/callback` (hosted).
+3. Local: put `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` / `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET` in `supabase/.env` (git-ignored), set `enabled = true` under `[auth.external.google]` in `supabase/config.toml`, restart Supabase. Hosted: Supabase dashboard → Authentication → Providers → Google.
+4. Build the app with `"GOOGLE_SIGN_IN": true` in `.env.json` to show the button.
 
 ## Rules
 

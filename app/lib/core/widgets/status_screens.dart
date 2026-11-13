@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/env.dart';
-
-/// Phase 0 placeholder. Replaced by the This Week screen in Phase 2.
-class PlaceholderScreen extends StatelessWidget {
-  const PlaceholderScreen({super.key});
+/// Shown when the app was built without Supabase config.
+class OfflineScreen extends StatelessWidget {
+  const OfflineScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,23 +21,31 @@ class PlaceholderScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text('Questly', style: theme.textTheme.displaySmall),
-              const SizedBox(height: 8),
-              Text(
-                'A new quest every Monday.',
-                style: theme.textTheme.titleMedium,
-              ),
               const SizedBox(height: 24),
               Text(
-                Env.hasSupabase
-                    ? 'Backend configured'
-                    : 'Backend not configured',
+                'Backend not configured',
                 key: const Key('backend-status'),
-                style: theme.textTheme.bodySmall,
+                style: theme.textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Run with --dart-define-from-file=../.env.json',
+                textAlign: TextAlign.center,
               ),
             ],
           ),
         ),
       ),
     );
+  }
+}
+
+/// Shown while auth state or the profile is loading.
+class SplashScreen extends StatelessWidget {
+  const SplashScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 }
