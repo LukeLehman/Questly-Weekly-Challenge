@@ -46,7 +46,7 @@ void main() {
 
     // Onboarded → home, username normalised to lowercase.
     expect(find.byType(ThisWeekScreen), findsOneWidget);
-    expect(find.text('Welcome, @newuser'), findsOneWidget);
+    expect(find.text('Hi @newuser'), findsOneWidget);
 
     // Sign out → back to sign-in.
     await tester.tap(find.byKey(const Key('sign-out')));
@@ -58,6 +58,6 @@ void main() {
     await tester.enterText(find.byKey(const Key('password')), 'secret123');
     await tester.tap(find.byKey(const Key('submit')));
     await tester.pumpAndSettle();
-    expect(find.text('Welcome, @newuser'), findsOneWidget);
+    expect(find.text('Hi @newuser'), findsOneWidget);
   });
 }

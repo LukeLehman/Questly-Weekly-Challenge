@@ -61,6 +61,8 @@ Run the web app on port 3000 (`--web-port 3000`): Supabase auth only redirects t
 - Routing: `app/lib/core/router.dart`. `authRedirect` sends users to sign-in → onboarding (until `profiles.username` is set) → home.
 - Database tests: `supabase/tests/database/*.test.sql` (pgTAP), run with `npx supabase test db`.
 - Generated files (`*.g.dart`, `*.freezed.dart`) are committed. Re-run build_runner after changing a model.
+- Time: read "now" via `clockProvider` (`app/lib/core/clock.dart`) so tests can fix it. Server-side rules always use the DB's `now()`; the client clock is only for display.
+- Challenge windows are half-open `[opens_at, closes_at)`, Monday 00:00 → next Monday 00:00 Europe/London. `supabase/seed.sql` seeds 12 weeks starting from the current week, so `npx supabase db reset` always gives a live challenge.
 
 ## Google sign-in (manual setup)
 
