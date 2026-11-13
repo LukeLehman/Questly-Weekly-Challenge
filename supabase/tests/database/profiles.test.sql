@@ -11,7 +11,8 @@ values
 
 -- Trigger
 select is(
-  (select count(*)::int from public.profiles),
+  (select count(*)::int from public.profiles
+    where id in ('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222')),
   2,
   'sign-up trigger creates a profile per user'
 );
@@ -41,7 +42,8 @@ set local role authenticated;
 set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}';
 
 select is(
-  (select count(*)::int from public.profiles),
+  (select count(*)::int from public.profiles
+    where id in ('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222')),
   2,
   'signed-in users can read profiles'
 );

@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../auth/data/auth_repository.dart';
+import 'package:go_router/go_router.dart';
+
 import '../../auth/presentation/auth_providers.dart';
+import '../../upload/presentation/upload_controller.dart';
 import '../data/challenge_repository.dart';
 import '../domain/challenge.dart';
 import 'challenge_providers.dart';
@@ -228,10 +231,22 @@ class _ResponsePanelState extends ConsumerState<_ResponsePanel> {
   @override
   Widget build(BuildContext context) {
     final status = ref.watch(myStatusProvider(widget.challenge.id));
+    final submission = ref.watch(mySubmissionProvider(widget.challenge.id));
     final theme = Theme.of(context);
 
-    if (!status.hasValue) {
+    if (!status.hasValue || !submission.hasValue) {
       return const Center(child: CircularProgressIndicator());
+    }
+
+    // Posted: the week is done. No more changing your mind.
+    if (submission.value != null) {
+      return _StatusBanner(
+        key: const Key('status-posted'),
+        icon: Icons.military_tech,
+        color: theme.colorScheme.tertiary,
+        message: 'Entry posted. Badge earned!',
+        action: const SizedBox.shrink(),
+      );
     }
 
     return switch (status.value) {
@@ -260,18 +275,30 @@ class _ResponsePanelState extends ConsumerState<_ResponsePanel> {
           ),
         ],
       ),
-      ParticipationStatus.accepted => _StatusBanner(
+      ParticipationStatus.accepted => Column(
         key: const Key('status-accepted'),
-        icon: Icons.check_circle,
-        color: theme.colorScheme.primary,
-        message: 'You\'re in! Post your entry before the timer runs out.',
-        action: TextButton(
-          key: const Key('change-to-decline'),
-          onPressed: _busy
-              ? null
-              : () => _respond(ParticipationStatus.declined),
-          child: const Text('Change my mind'),
-        ),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          FilledButton.icon(
+            key: const Key('post-entry'),
+            onPressed: () => context.push('/upload'),
+            icon: const Icon(Icons.upload),
+            label: const Text('Post your entry'),
+          ),
+          const SizedBox(height: 8),
+          _StatusBanner(
+            icon: Icons.check_circle,
+            color: theme.colorScheme.primary,
+            message: 'You\'re in! Post your entry before the timer runs out.',
+            action: TextButton(
+              key: const Key('change-to-decline'),
+              onPressed: _busy
+                  ? null
+                  : () => _respond(ParticipationStatus.declined),
+              child: const Text('Change my mind'),
+            ),
+          ),
+        ],
       ),
       ParticipationStatus.declined => _StatusBanner(
         key: const Key('status-declined'),

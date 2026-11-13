@@ -6,6 +6,7 @@ import '../features/auth/presentation/auth_providers.dart';
 import '../features/auth/presentation/onboarding_screen.dart';
 import '../features/auth/presentation/sign_in_screen.dart';
 import '../features/challenge/presentation/this_week_screen.dart';
+import '../features/upload/presentation/upload_screen.dart';
 import 'providers.dart';
 import 'widgets/status_screens.dart';
 
@@ -15,6 +16,7 @@ abstract final class Routes {
   static const signIn = '/sign-in';
   static const onboarding = '/onboarding';
   static const home = '/';
+  static const upload = '/upload';
 }
 
 /// Where the user should be, given backend/auth/profile state.
@@ -79,6 +81,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, _) => const OnboardingScreen(),
       ),
       GoRoute(path: Routes.home, builder: (_, _) => const ThisWeekScreen()),
+      GoRoute(path: Routes.upload, builder: (_, _) => const UploadScreen()),
     ],
   );
 });

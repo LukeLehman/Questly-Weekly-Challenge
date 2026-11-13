@@ -48,6 +48,7 @@ npx supabase migration up            # apply new migrations, KEEPS existing data
 npx supabase db reset                # wipes ALL data (incl. accounts); ask the owner first
 npx supabase status                  # local URL + anon key
 npx supabase test db                 # pgTAP tests in supabase/tests
+npx supabase functions serve --env-file supabase/functions/.env   # Edge Functions (needed for uploads)
 ```
 
 ## Config
@@ -64,6 +65,15 @@ Run the web app on port 3000 (`--web-port 3000`): Supabase auth only redirects t
 - Generated files (`*.g.dart`, `*.freezed.dart`) are committed. Re-run build_runner after changing a model.
 - Time: read "now" via `clockProvider` (`app/lib/core/clock.dart`) so tests can fix it. Server-side rules always use the DB's `now()`; the client clock is only for display.
 - Challenge windows are half-open `[opens_at, closes_at)`, Monday 00:00 → next Monday 00:00 Europe/London. `supabase/seed.sql` seeds 12 weeks starting from the current week, so `npx supabase db reset` always gives a live challenge.
+
+## Media uploads (Phase 3)
+
+- Flow: pick → `MediaProcessor` (mobile: 720p compress + JPEG thumb; web: 30 MB cap, no compression) → `create-upload-url` Edge Function → presigned PUTs straight to R2 → insert `submissions` row → `award_badge` trigger.
+- Presigned URLs sign Content-Type and Content-Length: the upload must match the declared type and exact size.
+- Keys: `submissions/{challenge_id}/{user_id}/{uuid}.{ext}` (+ `.thumb.jpg`). RLS rejects rows whose keys aren't under the poster's own prefix.
+- Limits (keep in sync: `create-upload-url/index.ts`, `UploadLimits` in `upload/domain/submission.dart`, DB checks): video 60 s / 30 MB, photo 10 MB, thumb 1 MB, caption 300, text body 2000.
+- Entries close at `closes_at` + 1 hour grace (`public.upload_grace()`); entries in the grace window still earn the badge.
+- R2 credentials: `supabase/functions/.env` locally (git-ignored), Supabase function secrets when hosted. The R2 token is object read/write only; bucket settings (CORS) are changed by the owner in the Cloudflare dashboard.
 
 ## Google sign-in (manual setup)
 

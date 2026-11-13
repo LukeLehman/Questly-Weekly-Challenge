@@ -66,5 +66,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Questly uses the camera to record or photograph your quest entry.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Questly records sound with your quest videos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Questly lets you choose a photo or video for your quest entry.</string>
 </dict>
 </plist>

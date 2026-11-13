@@ -91,6 +91,13 @@ The phone uploads straight to R2 with a short-lived signed URL; viewers stream s
 
 Later, not MVP: HLS via Cloudflare Stream or Mux.
 
+### Phase 3 decisions (2026-11-13)
+
+- Text entries (poems, stories) store their text in `submissions.body` (max 2000 chars); the plan's column list had no field for it.
+- Entries that land in the 1-hour grace period after `closes_at` still earn the badge, since the grace period exists for uploads that started before the deadline.
+- Size caps: video 30 MB (web can't compress; mobile output is ~5–10 MB), photo 10 MB, thumbnail 1 MB.
+- After posting an entry, a user can no longer change their answer to "declined".
+
 ## MVP screens
 
 Bottom nav: This Week, Feed, Upload (centre), Profile.
